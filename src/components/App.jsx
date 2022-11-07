@@ -1,78 +1,76 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 
 import { FeedbackOptions } from './feedback/FeedbackOptions/FeedbackOptions';
 import { Statistics } from './feedback/Statistics/Statistics';
 import { Section } from './feedback/Section/Section';
 import { Notification } from './feedback/Notification/Notification';
+import { ContainerDiv } from './App.styled';
 
-export class App extends Component {
-  static defaultProps = {
-    total: 0,
-    positivePercentage: 0,
+export function App() {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+  // const [total, setTotal] = useState(0);
+  // const [positivePercentage, setPositivePercentage] = useState(0);
+
+  const addGood = () => {
+    setGood(prevState => prevState + 1);
+  };
+  const addNeutral = () => {
+    setNeutral(prevState => prevState + 1);
+  };
+  const addBad = () => {
+    setBad(prevState => prevState + 1);
+  };
+  const handleFeedback = evt => {
+    switch (evt) {
+      case 'good':
+        addGood();
+        break;
+      case 'neutral':
+        addNeutral();
+        break;
+      case 'bad':
+        addBad();
+        break;
+      default:
+        return;
+    }
   };
 
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
-  };
-
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
+  const countTotalFeedback = () => {
     const result = good + neutral + bad;
     return result;
   };
 
-  countPositiveFeedbackPercentage = () => {
-    const { good } = this.state;
-    // if (good === 0) {
-    //   return 0;
-    // }
-    const result = this.countTotalFeedback();
+  const countPositiveFeedbackPercentage = () => {
+    const result = countTotalFeedback();
     const positiveFeedback = (good * 100) / result;
     return Math.round(positiveFeedback);
   };
 
-  handleFeedback = evt => {
-    this.setState(prevState => ({ [evt]: prevState[evt] + 1 }));
-  };
+  return (
+    <ContainerDiv>
+      <Section title="Please leave feedback">
+        <FeedbackOptions
+          options={Object.keys({ good, neutral, bad })}
+          onLeaveFeedback={handleFeedback}
+        />
+      </Section>
 
-  render() {
-    const { good, neutral, bad } = this.state;
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
-          padding: 30,
-          gap: 20,
-        }}
-      >
-        <Section title="Please leave feedback">
-          <FeedbackOptions
-            options={Object.keys(this.state)}
-            onLeaveFeedback={this.handleFeedback}
+      <Section title="Statistics">
+        {countTotalFeedback() !== 0 ? (
+          <Statistics
+            good={good}
+            neutral={neutral}
+            bad={bad}
+            total={countTotalFeedback()}
+            positivePercentage={countPositiveFeedbackPercentage()}
           />
-        </Section>
-
-        <Section title="Statistics">
-          {this.countTotalFeedback() !== 0 ? (
-            <Statistics
-              good={good}
-              neutral={neutral}
-              bad={bad}
-              total={this.countTotalFeedback()}
-              positivePercentage={this.countPositiveFeedbackPercentage()}
-            />
-          ) : (
-            <Notification message="There is no feedback"></Notification>
-          )}
-        </Section>
-      </div>
-    );
-  }
+        ) : (
+          <Notification message="There is no feedback"></Notification>
+        )}
+      </Section>
+    </ContainerDiv>
+  );
 }
