@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { FeedbackOptions } from './feedback/FeedbackOptions/FeedbackOptions';
 import { Statistics } from './feedback/Statistics/Statistics';
@@ -11,7 +11,7 @@ export function App() {
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
   const [total, setTotal] = useState(0);
-  // const [positivePercentage, setPositivePercentage] = useState(0);
+  const isFirstRender = useRef(true);
 
   const addGood = () => {
     setGood(prevState => prevState + 1);
@@ -22,6 +22,7 @@ export function App() {
   const addBad = () => {
     setBad(prevState => prevState + 1);
   };
+
   const handleFeedback = evt => {
     switch (evt) {
       case 'good':
@@ -39,17 +40,16 @@ export function App() {
   };
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      //запрет первого рендера
+      isFirstRender.current = false;
+      return;
+    }
     const total = good + neutral + bad;
     setTotal(total);
   }, [good, neutral, bad]);
 
-  // const countTotalFeedback = () => {
-  //   const result = good + neutral + bad;
-  //   return result;
-  // };
-
   const countPositiveFeedbackPercentage = () => {
-    // const result = countTotalFeedback();
     const positiveFeedback = (good * 100) / total;
     return Math.round(positiveFeedback);
   };
