@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 import { FeedbackOptions } from './feedback/FeedbackOptions/FeedbackOptions';
 import { Statistics } from './feedback/Statistics/Statistics';
@@ -11,7 +11,6 @@ export function App() {
   const [neutral, setNeutral] = useState(0);
   const [bad, setBad] = useState(0);
   const [total, setTotal] = useState(0);
-  const isFirstRender = useRef(true);
 
   const addGood = () => {
     setGood(prevState => prevState + 1);
@@ -40,11 +39,6 @@ export function App() {
   };
 
   useEffect(() => {
-    if (isFirstRender.current) {
-      //запрет первого рендера
-      isFirstRender.current = false;
-      return;
-    }
     const total = good + neutral + bad;
     setTotal(total);
   }, [good, neutral, bad]);
